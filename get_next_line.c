@@ -6,69 +6,13 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:16:06 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/05 15:52:19 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/06 16:50:13 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #define BUFFER_SIZE 10
-
-int	str_contain_c(char *str, char c)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == c || str[i] == '\0')
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-char	*ft_strdup(char *str)
-{
-	int		i;
-	char	*output;
-
-	i = 0;
-	output = malloc(ft_strlen(str) +1 * sizeof(char));
-	while (str[i])
-	{
-		output[i] = str[i];
-		i++;
-	}
-	output[i] = '\0';
-	return (output);
-}
-
-
-void	ft_strcat(char *dest, char *src)
-{
-	int	i;
-	int	start;
-
-	i = 0;
-	start = ft_strlen(dest);
-	while (src[i])
-	{
-		dest[start + i] = src[i];
-		i++;
-	}
-	dest[start + i] = '\0';
-}
-
+#define C_LIMIT '\n'
 
 char	*check_line(char *line, char *buffer)
 {
@@ -77,69 +21,90 @@ char	*check_line(char *line, char *buffer)
 	if (buffer == NULL)
 		return (NULL);
 	if (line == NULL)
-		new_line = ft_strdup(buffer);
+		new_line = ft_strdup_at_c(buffer, C_LIMIT);
 	else
 	{
 		new_line = malloc((ft_strlen(line) + ft_strlen(buffer) + 1));
 		if (new_line == NULL)
 			return (NULL);
 		new_line[0] = '\0';
-		ft_strcat(new_line, line);
-		ft_strcat(new_line, buffer);
+		ft_strcat_at_c(new_line, line, C_LIMIT);
+		ft_strcat_at_c(new_line, buffer, C_LIMIT);
 		free(line);
 	}
 	return (new_line);
 }
 
+char	*update_new_start_buffer(char *line, char *buffer)
+{
+	int i;
+
+	i = 0;
+	while (buffer[i] != C_LIMIT || buffer[i] == '\0')
+		i++;
+	i++;
+	return (&buffer[i]);
+}
+
 char *get_next_line(int fd)
 {
-	char 	*line;
-	char	buffer[BUFFER_SIZE + 1];
-	int		head_r;
-	int		bytes_read;
-	int		i;
+	char 		*line;
+	static char	static_buffer[BUFFER_SIZE + 1];
+	char		*buffer;
+	int			bytes_read;
+	int			total_read;
 
-
-	bytes_read = 0;
+	total_read = 0;
 	line = NULL;
+	buffer = static_buffer;
+
+	// check start if buffer contain \n
+	if(str_contain_c(buffer, '\n'))
+	{
+		printf("BEFORE update BUFF :***%s***\n", buffer);
+		buffer = update_new_start_buffer(line, buffer);
+		printf("NEW_START BUFF :***%s***\n", buffer);
+		line = check_line(line, buffer);
+		printf("Output :%s\n", line);
+	}
 	
 	while (!str_contain_c(buffer, '\n'))
 	{
+		bytes_read = read(fd, static_buffer, BUFFER_SIZE);
+		if (bytes_read == 0)
+			break;
+		buffer = static_buffer;
+		buffer[bytes_read] = 0;
+		total_read += bytes_read;
 		line = check_line(line, buffer);
-		// printf("LINE :%s\n", line);
-		// printf("BUFFER :%s\n", buffer);
-		head_r = read(fd, buffer, BUFFER_SIZE);
-		buffer[BUFFER_SIZE] = 0;
-		bytes_read += head_r;
-		i++;
+		// printf("BUFFER :***%s***\n", buffer);
+		// printf("-> LINE :%s\n\n", line);
 	}
-
-	// treatment if buffer contains \n
-	// if true put in line
-	if (str_contain_c(buffer, '\n'))
-	{
-	}
-	printf("\nbytes_read : %d\n", bytes_read);
-	printf("LINE :%s\n", line);
-	return "";
+	printf("\nBUFFER end :***%s***\n", buffer);
+	printf("total_read : %d\n", total_read);
+	return (line);
 }
 
 #include <sys/stat.h>
 #include <fcntl.h>
 
+int i = 1;
 void	test(int fd)
 {
 	char	*str;
 
+	printf("_________START %d__________\n", i);
 	str = get_next_line(fd);
-	printf("%s\n", str);
-	// free(str);
+	printf("Output :%s\n", str);
+	printf("\n\n\n");
+	free(str);
+	i++;
 }
 
 int	main(void)
 {
 	char	*str;
 	int fd = open("test.txt", O_RDONLY);
-	test(fd);
+	test(0);
 	return (0);
 }
