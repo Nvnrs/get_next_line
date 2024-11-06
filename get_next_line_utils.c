@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:18:13 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/06 16:49:29 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/06 18:51:21 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,16 @@ int	ft_strlen(char *str)
 
 	i = 0;
 	while (str[i])
+		i++;
+	return (i);
+}
+
+int	ft_strlen_at_c(char *str, char c)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] && str[i] != c)
 		i++;
 	return (i);
 }
@@ -42,7 +52,7 @@ char	*ft_strdup_at_c(char *str, char c)
 	char	*output;
 
 	i = 0;
-	output = malloc(ft_strlen(str) +1 * sizeof(char));
+	output = malloc(ft_strlen_at_c(str, c) +1 * sizeof(char));
 	while (str[i] && str[i] != c)
 	{
 		output[i] = str[i];
