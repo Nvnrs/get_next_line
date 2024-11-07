@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:18:13 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/06 18:51:21 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/07 16:24:55 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ char	*ft_strdup_at_c(char *str, char c)
 	int		i;
 	char	*output;
 
+	if (str == NULL)
+		return NULL;
 	i = 0;
 	output = malloc(ft_strlen_at_c(str, c) +1 * sizeof(char));
 	while (str[i] && str[i] != c)

@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:16:06 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/06 18:54:35 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/07 16:24:49 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,15 @@ char	*check_line(char *line, char *buffer)
 char	*update_new_start_buffer(char *buffer)
 {
 	int	i;
+	char	*buffer_advanced;
 
 	i = 0;
 	while (buffer[i] != C_LIMIT || buffer[i] == '\0')
 		i++;
 	i++;
-	return (&buffer[i]);
+
+	buffer_advanced = ft_strdup_at_c(&buffer[i], '\0');
+	return (buffer_advanced);
 }
 
 void	ft_strcpy(char *dest, char *src)
@@ -60,19 +63,17 @@ void	ft_strcpy(char *dest, char *src)
 	dest[i] = '\0';
 }
 
-void	check_if_has_start(char **line, char **buffer, char *static_buffer)
+void	check_if_has_start(char **line, char **buffer)
 {
-	char	*copy;
+	char	*buffer_advanced;
+
 	if (str_contain_c(*buffer, '\n'))
 	{
-		*buffer = update_new_start_buffer(*buffer);
-		*line = check_line(*line, *buffer);
-		// MAJ STATIC BUFFER WITH NEW BUFFER BECAUSE 
-		// IF YOU HAVE A BUFFER GREATHER THAN THE CONTENT FILE YOU READ THE FILE ONLY ONE TIME
-		// static_buffer = *buffer;
-		copy = ft_strdup_at_c(*buffer, '\0');
-		ft_strcpy(static_buffer, copy);
-		free(copy);
+		buffer_advanced = update_new_start_buffer(*buffer);
+		*line = check_line(*line, buffer_advanced);
+		free(*buffer);
+		*buffer = ft_strdup_at_c(buffer_advanced, '\0');
+		free(buffer_advanced);
 	}
 }
 
@@ -82,52 +83,28 @@ char	*get_next_line(int fd)
 	static char	static_buffer[BUFFER_SIZE + 1];
 	char		*buffer;
 	int			bytes_read;
-	int			total_read;
 
-	total_read = 0;
-	line = NULL;
-	buffer = static_buffer;
 	if (read(fd, 0, 0))
 		return NULL;
-	check_if_has_start(&line, &buffer, static_buffer);
+	line = NULL;
+	buffer = ft_strdup_at_c(static_buffer, '\0');
+	check_if_has_start(&line, &buffer);
+	ft_strcpy(static_buffer, buffer);
 	while (!str_contain_c(buffer, '\n'))
 	{
 		bytes_read = read(fd, static_buffer, BUFFER_SIZE);
+		static_buffer[bytes_read] = '\0';
 		if (bytes_read == 0)
-			break ;
-		buffer = static_buffer;
-		buffer[bytes_read] = 0;
-		total_read += bytes_read;
+		{
+			free(line);
+			free(buffer);
+			return (NULL);
+		}
+		if (buffer != NULL)
+			free(buffer);
+		buffer = ft_strdup_at_c(static_buffer, '\0');
 		line = check_line(line, buffer);
 	}
-	// printf("buffer = %s", buffer);
+	free(buffer);
 	return (line);
 }
-
-// #include <sys/stat.h>
-// #include <fcntl.h>
-
-// int i = 1;
-
-// void	test(int fd)
-// {
-// 	char	*str;
-
-// 	printf("_________START %d__________\n", i);
-// 	str = get_next_line(fd);
-// 	printf("Output :%s\n", str);
-// 	printf("\n\n\n");
-// 	free(str);
-// 	i++;
-// }
-
-// int	main(void)
-// {
-// 	int fd = open("test.txt", O_RDONLY);
-// 	test(fd);
-// 	test(fd);
-// 	test(fd);
-// 	test(fd);
-// 	test(fd);
-// 	return (0);
-// }

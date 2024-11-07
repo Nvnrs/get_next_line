@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:18:04 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/06 18:18:25 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/07 16:24:53 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #define C_LIMIT '\n'
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 1000
+# define BUFFER_SIZE 100
 #endif
 
 int		ft_strlen(char *str);
