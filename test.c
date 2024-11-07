@@ -25,23 +25,5 @@ int	main(void)
 	test(fd);
 	test(fd);
 	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
-	test(fd);
 	return (0);
 }

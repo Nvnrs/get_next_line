@@ -5,48 +5,112 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/05 12:16:06 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/07 16:24:49 by nveneros         ###   ########.fr       */
+/*   Created: 2024/11/07 16:26:03 by nveneros          #+#    #+#             */
+/*   Updated: 2024/11/07 18:38:44 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#define C_LIMIT '\n'
 
-char	*check_line(char *line, char *buffer)
+int	ft_strlen(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
+
+
+char	*ft_strdup(char *str)
+{
+	char	*output;
+	int		i;
+
+	i = 0;
+	if (str == NULL)
+		return (NULL);
+	output = malloc(ft_strlen(str) + 1  * sizeof(char));
+	while (str[i])
+	{
+		output[i] = str[i];
+		i++;
+	}
+	output[i] = '\0';
+	return (output);
+}
+
+// char	*ft_strcat_realloc(char *str1, char *str2)
+// {
+	
+// }
+
+int	str_contain_c(char *str, char c)
+{
+	int	i;
+
+	if (str == NULL)
+		return (0);
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == c)
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+char	*buffer_skip_first_linebreak(char *buffer)
+{
+	char	*buffer_advanced;
+	int		i;
+
+	i = 0;
+	buffer_advanced = NULL;
+	if (!str_contain_c(buffer, '\n'))
+	{
+		free(buffer);
+		return (NULL);
+	}
+	while (buffer[i] != '\n')
+		i++;
+	buffer_advanced = ft_strdup(&buffer[++i]);
+	free(buffer);
+	return (buffer_advanced);
+}
+
+void	ft_strcat_at_c(char *dest, char *src, char c)
+{
+	int	i;
+	int	start;
+
+	i = 0;
+	start = ft_strlen(dest);
+	while(src[i] && src[i] != c)
+	{
+		dest[i + start] = src[i];
+		i++;
+	}
+	dest[i + start] = '\0';
+}
+
+char	*handle_line(char *line, char *buffer)
 {
 	char	*new_line;
 
-	if (buffer == NULL)
-		return (NULL);
 	if (line == NULL)
-		new_line = ft_strdup_at_c(buffer, C_LIMIT);
+		new_line = ft_strdup(buffer);
 	else
 	{
-		new_line = malloc((ft_strlen_at_c(line, C_LIMIT) 
-		+ ft_strlen_at_c(buffer, C_LIMIT) + 1));
-		if (new_line == NULL)
-			return (NULL);
+		new_line = malloc(ft_strlen(line) + ft_strlen(buffer) + 1);
 		new_line[0] = '\0';
-		ft_strcat_at_c(new_line, line, C_LIMIT);
-		ft_strcat_at_c(new_line, buffer, C_LIMIT);
+		ft_strcat_at_c(new_line, line, '\0');
+		ft_strcat_at_c(new_line, buffer, '\0');
 		free(line);
 	}
 	return (new_line);
-}
-
-char	*update_new_start_buffer(char *buffer)
-{
-	int	i;
-	char	*buffer_advanced;
-
-	i = 0;
-	while (buffer[i] != C_LIMIT || buffer[i] == '\0')
-		i++;
-	i++;
-
-	buffer_advanced = ft_strdup_at_c(&buffer[i], '\0');
-	return (buffer_advanced);
 }
 
 void	ft_strcpy(char *dest, char *src)
@@ -56,55 +120,67 @@ void	ft_strcpy(char *dest, char *src)
 	i = 0;
 	while (src[i])
 	{
-		/* code */
 		dest[i] = src[i];
 		i++;
 	}
 	dest[i] = '\0';
 }
 
-void	check_if_has_start(char **line, char **buffer)
-{
-	char	*buffer_advanced;
-
-	if (str_contain_c(*buffer, '\n'))
-	{
-		buffer_advanced = update_new_start_buffer(*buffer);
-		*line = check_line(*line, buffer_advanced);
-		free(*buffer);
-		*buffer = ft_strdup_at_c(buffer_advanced, '\0');
-		free(buffer_advanced);
-	}
-}
+// BUFFER IS A COPY OF BUFFER STATIC WITH DYNAMIC ALLOCATION
 
 char	*get_next_line(int fd)
 {
-	char		*line;
-	static char	static_buffer[BUFFER_SIZE + 1];
+	static char buffer_static[BUFFER_SIZE + 1];
 	char		*buffer;
+	char		*line;
 	int			bytes_read;
 
-	if (read(fd, 0, 0))
-		return NULL;
+	bytes_read = 0;
+	buffer = NULL;
 	line = NULL;
-	buffer = ft_strdup_at_c(static_buffer, '\0');
-	check_if_has_start(&line, &buffer);
-	ft_strcpy(static_buffer, buffer);
+
+	// CHECK FD VALID
+	if (read(fd, 0, 0))
+		return (NULL);
+
+	// check if have last buffer static	
+	if (ft_strlen(buffer_static))
+	{
+		// printf("BUFFER STATIC EXISTANT");
+		buffer = ft_strdup(buffer_static);
+		line = handle_line(line, buffer);
+		// printf("LINE :%s\n", line);
+	}
+
 	while (!str_contain_c(buffer, '\n'))
 	{
-		bytes_read = read(fd, static_buffer, BUFFER_SIZE);
-		static_buffer[bytes_read] = '\0';
+		bytes_read = read(fd, buffer_static, BUFFER_SIZE);
+		buffer_static[bytes_read] = 0;
+		// printf("STATIC :%s\n", buffer_static);
+		// printf("LOOP	line :%s\n", line);
 		if (bytes_read == 0)
 		{
-			free(line);
-			free(buffer);
+			if (buffer)
+				free(buffer);
+			if (line)
+				free(line);
 			return (NULL);
 		}
-		if (buffer != NULL)
+		if (buffer)
 			free(buffer);
-		buffer = ft_strdup_at_c(static_buffer, '\0');
-		line = check_line(line, buffer);
+		buffer = ft_strdup(buffer_static);
+		line = handle_line(line, buffer);
 	}
+
+	// MAJ BUFFER STATIC
+	if (buffer)
+	{
+		// printf("BUFFER UPDATE FOR NEXT CALL\n");
+		buffer = buffer_skip_first_linebreak(buffer);
+		ft_strcpy(buffer_static, buffer);
+	}
+	
+	// END
 	free(buffer);
 	return (line);
 }
