@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:18:04 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/07 17:55:09 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/08 12:33:58 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,9 @@
 #endif
 
 char	*get_next_line(int fd);
+int		ft_strlen(char *str);
+char	*ft_strdup(char *str);
+char	*reduce_str_at_c(char *str, char c);
 
 
 #endif

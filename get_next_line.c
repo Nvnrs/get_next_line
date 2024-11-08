@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:26:03 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/07 18:38:44 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/08 16:10:35 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,17 @@ int	ft_strlen(char *str)
 	return (i);
 }
 
+int	ft_strlen_at_c(char *str, char c)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] && str[i] != c)
+		i++;
+	if (str[i] == c)
+		i++;
+	return (i);
+}
 
 char	*ft_strdup(char *str)
 {
@@ -33,6 +44,25 @@ char	*ft_strdup(char *str)
 		return (NULL);
 	output = malloc(ft_strlen(str) + 1  * sizeof(char));
 	while (str[i])
+	{
+		output[i] = str[i];
+		i++;
+	}
+	output[i] = '\0';
+	return (output);
+}
+
+
+char	*ft_strdup_at_c(char *str, char c)
+{
+	char	*output;
+	int		i;
+
+	i = 0;
+	if (str == NULL)
+		return (NULL);
+	output = malloc(ft_strlen_at_c(str, c) + 1  * sizeof(char));
+	while (str[i] && str[i] != c)
 	{
 		output[i] = str[i];
 		i++;
@@ -81,14 +111,14 @@ char	*buffer_skip_first_linebreak(char *buffer)
 	return (buffer_advanced);
 }
 
-void	ft_strcat_at_c(char *dest, char *src, char c)
+void	ft_strcat(char *dest, char *src)
 {
 	int	i;
 	int	start;
 
 	i = 0;
 	start = ft_strlen(dest);
-	while(src[i] && src[i] != c)
+	while(src[i])
 	{
 		dest[i + start] = src[i];
 		i++;
@@ -96,20 +126,49 @@ void	ft_strcat_at_c(char *dest, char *src, char c)
 	dest[i + start] = '\0';
 }
 
+
+char	*reduce_str_at_c(char *str, char c)
+{
+	int		i;
+	char	*outptut;
+
+	i = 0;
+	outptut = malloc(ft_strlen_at_c(str, c) + 1 * sizeof(char));
+	while (str[i] && str[i] != c)
+	{
+		outptut[i] = str[i];
+		i++;
+	}
+	if (str[i] == c)
+	{
+		outptut[i] = str[i];
+		i++;
+	}
+	outptut[i] = '\0';
+	return outptut;
+	
+}
+
 char	*handle_line(char *line, char *buffer)
 {
+	char	*buffer_at_breakline;
 	char	*new_line;
+	int		new_length;
 
+	buffer_at_breakline = reduce_str_at_c(buffer, '\n');
+	// printf("bufferat_breakline :%s", buffer_at_breakline);
 	if (line == NULL)
-		new_line = ft_strdup(buffer);
+		new_line = ft_strdup(buffer_at_breakline);
 	else
 	{
-		new_line = malloc(ft_strlen(line) + ft_strlen(buffer) + 1);
+		new_length = ft_strlen(line) + ft_strlen(buffer_at_breakline);
+		new_line = malloc(new_length + 1);
 		new_line[0] = '\0';
-		ft_strcat_at_c(new_line, line, '\0');
-		ft_strcat_at_c(new_line, buffer, '\0');
+		ft_strcat(new_line, line);
+		ft_strcat(new_line, buffer_at_breakline);
 		free(line);
 	}
+	free(buffer_at_breakline);
 	return (new_line);
 }
 
@@ -118,7 +177,7 @@ void	ft_strcpy(char *dest, char *src)
 	int	i;
 
 	i = 0;
-	while (src[i])
+	while (src && src[i])
 	{
 		dest[i] = src[i];
 		i++;
@@ -127,7 +186,7 @@ void	ft_strcpy(char *dest, char *src)
 }
 
 // BUFFER IS A COPY OF BUFFER STATIC WITH DYNAMIC ALLOCATION
-
+// BUFFER_TEMP is a copy of buffer without \n
 char	*get_next_line(int fd)
 {
 	static char buffer_static[BUFFER_SIZE + 1];
@@ -148,6 +207,7 @@ char	*get_next_line(int fd)
 	{
 		// printf("BUFFER STATIC EXISTANT");
 		buffer = ft_strdup(buffer_static);
+		// printf("BUFFER %s\n", buffer);
 		line = handle_line(line, buffer);
 		// printf("LINE :%s\n", line);
 	}
@@ -156,15 +216,18 @@ char	*get_next_line(int fd)
 	{
 		bytes_read = read(fd, buffer_static, BUFFER_SIZE);
 		buffer_static[bytes_read] = 0;
-		// printf("STATIC :%s\n", buffer_static);
+		// printf("STATIC :%s", buffer_static);
 		// printf("LOOP	line :%s\n", line);
 		if (bytes_read == 0)
 		{
-			if (buffer)
-				free(buffer);
-			if (line)
-				free(line);
-			return (NULL);
+			if (line && ft_strlen(line))
+				break;
+			else
+			{
+				if (buffer)
+					free(buffer);
+				return (line);
+			}
 		}
 		if (buffer)
 			free(buffer);
@@ -176,8 +239,10 @@ char	*get_next_line(int fd)
 	if (buffer)
 	{
 		// printf("BUFFER UPDATE FOR NEXT CALL\n");
+		// printf("BUFFER %s\n", buffer);
 		buffer = buffer_skip_first_linebreak(buffer);
 		ft_strcpy(buffer_static, buffer);
+		// printf("static %s\n", buffer_static);
 	}
 	
 	// END
