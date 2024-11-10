@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:26:03 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/08 16:10:35 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/10 12:27:52 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,7 +199,7 @@ char	*get_next_line(int fd)
 	line = NULL;
 
 	// CHECK FD VALID
-	if (read(fd, 0, 0))
+	if (fd < 0)
 		return (NULL);
 
 	// check if have last buffer static	
@@ -218,7 +218,19 @@ char	*get_next_line(int fd)
 		buffer_static[bytes_read] = 0;
 		// printf("STATIC :%s", buffer_static);
 		// printf("LOOP	line :%s\n", line);
-		if (bytes_read == 0)
+		// printf("Bytes READ :%d", bytes_read);
+		if (bytes_read == -1)
+		{
+			if (line)
+				free(line);
+			if (buffer)
+			{
+				ft_strcpy(buffer_static, "");
+				free(buffer);
+			}
+			return (NULL);
+		}
+		if (bytes_read <= 0)
 		{
 			if (line && ft_strlen(line))
 				break;
