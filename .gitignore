@@ -1,3 +1,6 @@
 a.out
 *.o
-.*
+files/*
+main.c
+main_bonus.c
+.vscode
