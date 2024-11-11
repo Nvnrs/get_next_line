@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:26:03 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/11 14:56:41 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/11 15:14:26 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,4 +114,3 @@ char	*get_next_line(int fd)
 	buffer_skip_first_linebreak(buffer_static[fd]);
 	return (line);
 }
-
