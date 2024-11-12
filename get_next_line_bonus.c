@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:26:03 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/12 15:11:15 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/12 15:46:21 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ char	*reduce_str_at_c(char *str, char c)
 		output[i] = str[i];
 		i++;
 	}
-	if (str[i] == c)
+	if (str[i] == c && c != '\0')
 	{
 		output[i] = str[i];
 		i++;
