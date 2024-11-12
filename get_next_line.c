@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:26:03 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/11 15:09:34 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/12 15:11:40 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,22 +36,24 @@ void	buffer_skip_first_linebreak(char *buffer_static)
 char	*reduce_str_at_c(char *str, char c)
 {
 	int		i;
-	char	*outptut;
+	char	*output;
 
 	i = 0;
-	outptut = malloc(ft_strlen_at_c(str, c) + 1 * sizeof(char));
+	output = malloc(ft_strlen_at_c(str, c) + 1 * sizeof(char));
+	if (output == NULL)
+		return (NULL);
 	while (str[i] && str[i] != c)
 	{
-		outptut[i] = str[i];
+		output[i] = str[i];
 		i++;
 	}
 	if (str[i] == c)
 	{
-		outptut[i] = str[i];
+		output[i] = str[i];
 		i++;
 	}
-	outptut[i] = '\0';
-	return (outptut);
+	output[i] = '\0';
+	return (output);
 }
 
 char	*handle_line(char *line, char *buffer)
@@ -68,6 +70,12 @@ char	*handle_line(char *line, char *buffer)
 		new_length = ft_strlen_at_c(line, '\0')
 			+ ft_strlen_at_c(buffer_at_breakline, '\0');
 		new_line = malloc(new_length + 1);
+		if (new_line == NULL)
+		{
+			free(line);
+			free(buffer_at_breakline);
+			return (NULL);
+		}
 		new_line[0] = '\0';
 		ft_strcat(new_line, line);
 		ft_strcat(new_line, buffer_at_breakline);

@@ -6,7 +6,7 @@
 /*   By: nveneros <nveneros@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:18:13 by nveneros          #+#    #+#             */
-/*   Updated: 2024/11/11 15:10:16 by nveneros         ###   ########.fr       */
+/*   Updated: 2024/11/12 15:06:12 by nveneros         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ char	*ft_strdup(char *str)
 	if (str == NULL)
 		return (NULL);
 	output = malloc((ft_strlen_at_c(str, '\0') + 1) * sizeof(char));
+	if (output == NULL)
+		return (NULL);
 	while (str[i])
 	{
 		output[i] = str[i];

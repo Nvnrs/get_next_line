@@ -1,6 +1,8 @@
 a.out
 *.o
 files/*
+test*
+get_next_line_tester/
 main.c
 main_bonus.c
 .vscode
